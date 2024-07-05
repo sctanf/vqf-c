@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include "vqf.h"
+#include <string.h>
 
 #define TICK_INTERVAL       4*0.000313f
     // you should change this value to match your application
@@ -221,8 +222,8 @@ static void quatApplyDelta(vqf_real_t q[], vqf_real_t delta, vqf_real_t out[])
 {
     // out = quatMultiply([cos(delta/2), 0, 0, sin(delta/2)], q)
     // sin and cos can be replaced by arm_sin_f32 and arm_cos_f32 from CMSIS-DSP
-    vqf_real_t c = cos_fast(delta/2);
-    vqf_real_t s = sin_fast(delta/2);
+    vqf_real_t c = cosf(delta/2);
+    vqf_real_t s = sinf(delta/2);
     vqf_real_t w = c * q[0] - s * q[3];
     vqf_real_t x = c * q[1] - s * q[2];
     vqf_real_t y = c * q[2] + s * q[1];
@@ -260,7 +261,7 @@ static void filterCoeffs(vqf_real_t tau, vqf_real_t Ts, vqf_double_t outB[], vqf
     // second order Butterworth filter based on https://stackoverflow.com/a/52764064
     vqf_double_t fc = (M_SQRT2 / (2.0*M_PIf))/(vqf_double_t)(tau); // time constant of dampened, non-oscillating part of step response
     // tan_fast can be replaced by sin/cos from CMSIS_DSP lib
-    vqf_double_t C = tan_fast(M_PIf*fc*(vqf_double_t)(Ts));
+    vqf_double_t C = tanf(M_PIf*fc*(vqf_double_t)(Ts));
     // sqrt can be replaced by arm_sqrt_f32 from CMSIS_DSP
     vqf_double_t D = C*C + sqrt(2)*C + 1;
     vqf_double_t b0 = C*C/D;
@@ -466,8 +467,8 @@ void updateGyr(const vqf_real_t gyr[3])
     vqf_real_t angle = gyrNorm * coeffs.gyrTs;
     if (gyrNorm > EPS) {
         // sin cos can be replaced by arm_sin_f32 and arm_cos_f32 from CMSIS-DSP
-        vqf_real_t c = cos_fast(angle/2);
-        vqf_real_t s = sin_fast(angle/2)/gyrNorm;
+        vqf_real_t c = cosf(angle/2);
+        vqf_real_t s = sinf(angle/2)/gyrNorm;
         vqf_real_t gyrStepQuat[4] = {c, s*gyrNoBias[0], s*gyrNoBias[1], s*gyrNoBias[2]};
         quatMultiply(state.gyrQuat, gyrStepQuat, state.gyrQuat);
         normalize(state.gyrQuat, 4);
@@ -837,7 +838,7 @@ vqf_real_t getBiasEstimate(vqf_real_t out[3])
 
 void setBiasEstimate(vqf_real_t bias[3], vqf_real_t sigma)
 {
-    memcpy(state.bias, bias, sizeof(bias));
+    memcpy(state.bias, bias, sizeof(bias[0])*3);
     // std::copy(bias, bias+3, state.bias);
     if (sigma > 0) {
         vqf_real_t P = vqf_square(sigma*(vqf_real_t)(180.0*100.0/M_PIf));
@@ -997,7 +998,7 @@ void resetState()
     matrix3SetToScaledIdentity(coeffs.biasP0, state.biasP);
 
 
-    for (size_t i = 0; i < 18; i++) {
+    for (size_t i = 0; i < 3; i++) {
         state.restLastGyrLp[i] = NaN;
     }
     vqf_fill_double(state.motionBiasEstRLpState, 9*2, NaN);
