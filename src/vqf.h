@@ -825,15 +825,15 @@ void setRestDetectionThresholds(vqf_real_t thGyr, vqf_real_t thAcc);
 /**
  * @brief Returns the current parameters.
  */
-//const vqf_params_t& getParams();
+const vqf_params_t getParams();
 /**
  * @brief Returns the coefficients used by the algorithm.
  */
-//const vqf_coeffs_t& getCoeffs();
+const vqf_coeffs_t getCoeffs();
 /**
  * @brief Returns the current state.
  */
-//const vqf_state_t& getState();
+const vqf_state_t getState();
 /**
  * @brief Overwrites the current state.
  *
@@ -842,7 +842,7 @@ void setRestDetectionThresholds(vqf_real_t thGyr, vqf_real_t thAcc);
  *
  * @param state A vqf_state_t struct containing the new state
  */
-//void setState(const vqf_state_t& state);
+void setState(const vqf_state_t state);
 /**
  * @brief Resets the state to the default values at initialization.
  *

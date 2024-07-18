@@ -907,6 +907,26 @@ void setRestDetectionThresholds(vqf_real_t thGyr, vqf_real_t thAcc)
     params.restThAcc = thAcc;
 }
 
+const vqf_params_t getParams()
+{
+    return params;
+}
+
+const vqf_coeffs_t getCoeffs()
+{
+    return coeffs;
+}
+
+const vqf_state_t getState()
+{
+    return state;
+}
+
+void setState(const vqf_state_t new_state)
+{
+    state = new_state;
+}
+
 void resetState()
 {
     quatSetToIdentity(state.gyrQuat);
