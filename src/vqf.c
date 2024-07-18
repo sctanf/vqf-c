@@ -15,92 +15,26 @@
 #define M_SQRT2     1.41421356237309504880   // sqrt(2)s
 #define M_PIf       3.14159265358979323846f
 
-typedef struct vqf_params_s {
-    vqf_real_t tauAcc;
-    vqf_real_t tauMag;
-    bool motionBiasEstEnabled;
-    bool restBiasEstEnabled;
-    bool magDistRejectionEnabled;
-    vqf_real_t biasSigmaInit;
-    vqf_real_t biasForgettingTime;
-    vqf_real_t biasClip;
-    vqf_real_t biasSigmaMotion;
-    vqf_real_t biasVerticalForgettingFactor;
-    vqf_real_t biasSigmaRest;
-    vqf_real_t restMinT;
-    vqf_real_t restFilterTau;
-    vqf_real_t restThGyr;
-    vqf_real_t restThAcc;
-    vqf_real_t magCurrentTau;
-    vqf_real_t magRefTau;
-    vqf_real_t magNormTh;
-    vqf_real_t magDipTh;
-    vqf_real_t magNewTime;
-    vqf_real_t magNewFirstTime;
-    vqf_real_t magNewMinGyr;
-    vqf_real_t magMinUndisturbedTime;
-    vqf_real_t magMaxRejectionTime;
-    vqf_real_t magRejectionFactor;
-} vqf_params_t;
-
-
-typedef struct vqf_coeffs_s {
-    vqf_real_t gyrTs;
-    vqf_real_t accTs;
-    vqf_real_t magTs;
-    vqf_double_t accLpB[3];
-    vqf_double_t accLpA[2];
-    vqf_real_t kMag;
-    vqf_real_t biasP0;
-    vqf_real_t biasV;
-    vqf_real_t biasMotionW;
-    vqf_real_t biasVerticalW;
-    vqf_real_t biasRestW;
-    vqf_double_t restGyrLpB[3];
-    vqf_double_t restGyrLpA[2];
-    vqf_double_t restAccLpB[3];
-    vqf_double_t restAccLpA[2];
-    vqf_real_t kMagRef;
-    vqf_double_t magNormDipLpB[3];
-    vqf_double_t magNormDipLpA[2];
-} vqf_coeffs_t ;
-
-typedef struct vqf_state_s {
-    vqf_real_t gyrQuat[4];
-    vqf_real_t accQuat[4];
-    vqf_real_t delta;
-    bool restDetected;
-    bool magDistDetected;
-    vqf_real_t lastAccLp[3];
-    vqf_double_t accLpState[3*2];
-    vqf_real_t lastAccCorrAngularRate;
-    vqf_real_t kMagInit;
-    vqf_real_t lastMagDisAngle;
-    vqf_real_t lastMagCorrAngularRate;
-    vqf_real_t bias[3];
-    vqf_real_t biasP[9];
-    vqf_double_t motionBiasEstRLpState[9*2];
-    vqf_double_t motionBiasEstBiasLpState[2*2];
-    vqf_real_t restLastSquaredDeviations[2];
-    vqf_real_t restT;
-    vqf_real_t restLastGyrLp[3];
-    vqf_double_t restGyrLpState[3*2];
-    vqf_real_t restLastAccLp[3];
-    vqf_double_t restAccLpState[3*2];
-    vqf_real_t magRefNorm;
-    vqf_real_t magRefDip;
-    vqf_real_t magUndisturbedT;
-    vqf_real_t magRejectT;
-    vqf_real_t magCandidateNorm;
-    vqf_real_t magCandidateDip;
-    vqf_real_t magCandidateT;
-    vqf_real_t magNormDip[2];
-    vqf_double_t magNormDipLpState[2*2];
-} vqf_state_t;
-
+/**
+ * @brief Contains the current parameters.
+ *
+ * See #getParams. To set parameters, pass them to the constructor. Part of the parameters can be changed with
+ * #setTauAcc, #setTauMag, #setMotionBiasEstEnabled, #setRestBiasEstEnabled, #setMagDistRejectionEnabled, and
+ * #setRestDetectionThresholds.
+ */
 static vqf_params_t params;
-static vqf_coeffs_t coeffs;
+/**
+ * @brief Contains the current state.
+ *
+ * See #getState, #getState and #resetState.
+ */
 static vqf_state_t state;
+/**
+ * @brief Contains the current coefficients (calculated in #setup).
+ *
+ * See #getCoeffs.
+ */
+static vqf_coeffs_t coeffs;
 
 static void init_params(void)
 {
