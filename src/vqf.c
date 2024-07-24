@@ -7,9 +7,6 @@
 #include "vqf.h"
 #include <string.h>
 
-#define TICK_INTERVAL       4*0.000313f
-    // you should change this value to match your application
-
 #define EPS FLT_EPSILON
 #define NaN NAN
 #define M_SQRT2     1.41421356237309504880   // sqrt(2)s
