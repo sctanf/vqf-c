@@ -149,7 +149,7 @@ static void quatSetToIdentity(vqf_real_t out[4])
     out[3] = 0;
 }
 
-static void quatApplyDelta(vqf_real_t q[], vqf_real_t delta, vqf_real_t out[])
+static void quatApplyDelta(vqf_real_t q[4], vqf_real_t delta, vqf_real_t out[4])
 {
     // out = quatMultiply([cos(delta/2), 0, 0, sin(delta/2)], q)
     // sin and cos can be replaced by arm_sin_f32 and arm_cos_f32 from CMSIS-DSP
@@ -185,7 +185,7 @@ static vqf_real_t gainFromTau(vqf_real_t tau, vqf_real_t Ts)
     }
 }
 
-static void filterCoeffs(vqf_real_t tau, vqf_real_t Ts, vqf_double_t outB[], vqf_double_t outA[])
+static void filterCoeffs(vqf_real_t tau, vqf_real_t Ts, vqf_double_t outB[3], vqf_double_t outA[2])
 {
     // assert(tau > 0);
     // assert(Ts > 0);
@@ -205,7 +205,7 @@ static void filterCoeffs(vqf_real_t tau, vqf_real_t Ts, vqf_double_t outB[], vqf
     outA[1] = (1-sqrt(2)*C+C*C)/D; // a2
 }
 
-static void filterInitialState(vqf_real_t x0, const vqf_double_t b[3], const vqf_double_t a[2], vqf_double_t out[])
+static void filterInitialState(vqf_real_t x0, const vqf_double_t b[], const vqf_double_t a[], vqf_double_t out[2])
 {
     // initial state for steady state (equivalent to scipy.signal.lfilter_zi, obtained by setting y=x=x0 in the filter
     // update equation)
@@ -213,9 +213,9 @@ static void filterInitialState(vqf_real_t x0, const vqf_double_t b[3], const vqf
     out[1] = x0*(b[2] - a[1]);
 }
 
-static void filterAdaptStateForCoeffChange(vqf_real_t last_y[], size_t N, const vqf_double_t b_old[],
-                                         const vqf_double_t a_old[], const vqf_double_t b_new[],
-                                         const vqf_double_t a_new[], vqf_double_t state[])
+static void filterAdaptStateForCoeffChange(vqf_real_t last_y[], size_t N, const vqf_double_t b_old[3],
+                                         const vqf_double_t a_old[2], const vqf_double_t b_new[3],
+                                         const vqf_double_t a_new[2], vqf_double_t state[])
 {
     if (isnan(state[0])) {
         return;
