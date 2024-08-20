@@ -619,7 +619,7 @@ typedef struct vqf_coeffs_s
  * @param magTs sampling time of the magnetometer measurements in seconds (the value of `gyrTs` is used if set to -1)
  *
  */
-void initVqf(vqf_real_t gyrTs, vqf_real_t accTs, vqf_real_t magTs);
+void initVqf(vqf_params_t *const params, vqf_state_t *const state, vqf_coeffs_t *const coeffs, vqf_real_t gyrTs, vqf_real_t accTs, vqf_real_t magTs);
 /**
  * @brief Performs gyroscope update step.
  *
@@ -628,7 +628,7 @@ void initVqf(vqf_real_t gyrTs, vqf_real_t accTs, vqf_real_t magTs);
  *
  * @param gyr gyroscope measurement in rad/s
  */
-void updateGyr(const vqf_real_t gyr[3]);
+void updateGyr(vqf_params_t *const params, vqf_state_t *const state, vqf_coeffs_t *const coeffs, const vqf_real_t gyr[3]);
 /**
  * @brief Performs accelerometer update step.
  *
@@ -639,7 +639,7 @@ void updateGyr(const vqf_real_t gyr[3]);
  *
  * @param acc accelerometer measurement in m/s²
  */
-void updateAcc(const vqf_real_t acc[3]);
+void updateAcc(vqf_params_t *const params, vqf_state_t *const state, vqf_coeffs_t *const coeffs, const vqf_real_t acc[3]);
 /**
  * @brief Performs magnetometer update step.
  *
@@ -650,7 +650,7 @@ void updateAcc(const vqf_real_t acc[3]);
  *
  * @param mag magnetometer measurement in arbitrary units
  */
-void updateMag(const vqf_real_t mag[3]);
+void updateMag(vqf_params_t *const params, vqf_state_t *const state, vqf_coeffs_t *const coeffs, const vqf_real_t mag[3]);
 /**
  * @brief Performs filter update step for one sample (magnetometer-free).
  * @param gyr gyroscope measurement in rad/s
@@ -708,19 +708,19 @@ void updateMag(const vqf_real_t mag[3]);
  * \f$^{\mathcal{S}_i}_{\mathcal{I}_i}\mathbf{q}\f$.
  * @param out output array for the quaternion
  */
-void getQuat3D(vqf_real_t out[4]);
+void getQuat3D(vqf_state_t *const state, vqf_real_t out[4]);
 /**
  * @brief Returns the 6D (magnetometer-free) orientation quaternion
  * \f$^{\mathcal{S}_i}_{\mathcal{E}_i}\mathbf{q}\f$.
  * @param out output array for the quaternion
  */
-void getQuat6D(vqf_real_t out[4]);
+void getQuat6D(vqf_state_t *const state, vqf_real_t out[4]);
 /**
  * @brief Returns the 9D (with magnetometers) orientation quaternion
  * \f$^{\mathcal{S}_i}_{\mathcal{E}}\mathbf{q}\f$.
  * @param out output array for the quaternion
  */
-void getQuat9D(vqf_real_t out[4]);
+void getQuat9D(vqf_state_t *const state, vqf_real_t out[4]);
 /**
  * @brief Returns the heading difference \f$\delta\f$ between \f$\mathcal{E}_i\f$ and \f$\mathcal{E}\f$.
  *
@@ -729,7 +729,7 @@ void getQuat9D(vqf_real_t out[4]);
  *
  * @return delta angle in rad (vqf_state_t::delta)
  */
-vqf_real_t getDelta();
+vqf_real_t getDelta(vqf_state_t *const state);
 
 /**
  * @brief Returns the current gyroscope bias estimate and the uncertainty.
@@ -740,7 +740,7 @@ vqf_real_t getDelta();
  * @param out output array for the gyroscope bias estimate (rad/s)
  * @return standard deviation sigma of the estimation uncertainty (rad/s)
  */
-vqf_real_t getBiasEstimate(vqf_real_t out[3]);
+vqf_real_t getBiasEstimate(vqf_state_t *const state, vqf_coeffs_t *const coeffs, vqf_real_t out[3]);
 /**
  * @brief Sets the current gyroscope bias estimate and the uncertainty.
  *
@@ -751,15 +751,15 @@ vqf_real_t getBiasEstimate(vqf_real_t out[3]);
  * @param sigma standard deviation of the estimation uncertainty (rad/s) - set to -1 (default) in order to not
  *        change the estimation covariance matrix
  */
-void setBiasEstimate(vqf_real_t bias[3], vqf_real_t sigma);
+void setBiasEstimate(vqf_state_t *const state, vqf_real_t bias[3], vqf_real_t sigma);
 /**
  * @brief Returns true if rest was detected.
  */
-bool getRestDetected();
+bool getRestDetected(vqf_state_t *const state);
 /**
  * @brief Returns true if a disturbed magnetic field was detected.
  */
-bool getMagDistDetected();
+bool getMagDistDetected(vqf_state_t *const state);
 /**
  * @brief Returns the relative deviations used in rest detection.
  *
@@ -769,21 +769,21 @@ bool getMagDistDetected();
  *
  * @param out output array of size 2 for the relative rest deviations
   */
-void getRelativeRestDeviations(vqf_real_t out[2]);
+void getRelativeRestDeviations(vqf_params_t *const params, vqf_state_t *const state, vqf_real_t out[2]);
 /**
  * @brief Returns the norm of the currently accepted magnetic field reference.
  */
-vqf_real_t getMagRefNorm();
+vqf_real_t getMagRefNorm(vqf_state_t *const state);
 /**
  * @brief Returns the dip angle of the currently accepted magnetic field reference.
  */
-vqf_real_t getMagRefDip();
+vqf_real_t getMagRefDip(vqf_state_t *const state);
 /**
  * @brief Overwrites the current magnetic field reference.
  * @param norm norm of the magnetic field reference
  * @param dip dip angle of the magnetic field reference
  */
-void setMagRef(vqf_real_t norm, vqf_real_t dip);
+void setMagRef(vqf_state_t *const state, vqf_real_t norm, vqf_real_t dip);
 
 /**
  * @brief Sets the time constant for accelerometer low-pass filtering.
@@ -792,7 +792,7 @@ void setMagRef(vqf_real_t norm, vqf_real_t dip);
  *
  * @param tauAcc time constant \f$\tau_\mathrm{acc}\f$ in seconds
  */
-void setTauAcc(vqf_real_t tauAcc);
+void setTauAcc(vqf_params_t *const params, vqf_state_t *const state, vqf_coeffs_t *const coeffs, vqf_real_t tauAcc);
 /**
  * @brief Sets the time constant for the magnetometer update.
  *
@@ -800,55 +800,34 @@ void setTauAcc(vqf_real_t tauAcc);
  *
  * @param tauMag time constant \f$\tau_\mathrm{mag}\f$ in seconds
  */
-void setTauMag(vqf_real_t tauMag);
+void setTauMag(vqf_params_t *const params, vqf_coeffs_t *const coeffs, vqf_real_t tauMag);
 #ifndef VQF_NO_MOTION_BIAS_ESTIMATION
 /**
  * @brief Enables/disabled gyroscope bias estimation during motion.
  */
-void setMotionBiasEstEnabled(bool enabled);
+void setMotionBiasEstEnabled(vqf_params_t *const params, vqf_state_t *const state, bool enabled);
 #endif
 /**
  * @brief Enables/disables rest detection and bias estimation during rest.
  */
-void setRestBiasEstEnabled(bool enabled);
+void setRestBiasEstEnabled(vqf_params_t *const params, vqf_state_t *const state, bool enabled);
 /**
  * @brief Enables/disables magnetic disturbance detection and rejection.
  */
-void setMagDistRejectionEnabled(bool enabled);
+void setMagDistRejectionEnabled(vqf_params_t *const params, vqf_state_t *const state, bool enabled);
 /**
  * @brief Sets the current thresholds for rest detection.
  *
  * For details about the parameters, see vqf_params_t.restThGyr and vqf_params_t.restThAcc.
  */
-void setRestDetectionThresholds(vqf_real_t thGyr, vqf_real_t thAcc);
+void setRestDetectionThresholds(vqf_params_t *const params, vqf_real_t thGyr, vqf_real_t thAcc);
 
-/**
- * @brief Returns the current parameters.
- */
-const vqf_params_t getParams();
-/**
- * @brief Returns the coefficients used by the algorithm.
- */
-const vqf_coeffs_t getCoeffs();
-/**
- * @brief Returns the current state.
- */
-const vqf_state_t getState();
-/**
- * @brief Overwrites the current state.
- *
- * This method allows to set a completely arbitrary filter state and is intended for debugging purposes. In
- * combination with #getState, individual elements of the state can be modified.
- *
- * @param state A vqf_state_t struct containing the new state
- */
-void setState(const vqf_state_t state);
 /**
  * @brief Resets the state to the default values at initialization.
  *
  * Resetting the state is equivalent to creating a new instance of this class.
  */
-void resetState();
+void resetState(vqf_params_t *const params, vqf_state_t *const state, vqf_coeffs_t *const coeffs);
 
 /**
  * @brief Performs quaternion multiplication (\f$\mathbf{q}_\mathrm{out} = \mathbf{q}_1 \otimes \mathbf{q}_2\f$).
