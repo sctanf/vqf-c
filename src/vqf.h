@@ -603,6 +603,7 @@ typedef struct vqf_coeffs_s
  * \endrst
  */
 
+void init_params(vqf_params_t *const params);
 /**
  * Initializes the object with default parameters.
  *

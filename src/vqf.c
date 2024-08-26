@@ -12,7 +12,7 @@
 #define M_SQRT2     1.41421356237309504880   // sqrt(2)s
 #define M_PIf       3.14159265358979323846f
 
-static void init_params(vqf_params_t *const params)
+void init_params(vqf_params_t *const params)
 {
     params->tauAcc = 3.0f;
     params->tauMag = 9.0f;
